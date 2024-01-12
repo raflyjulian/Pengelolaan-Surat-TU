@@ -15,47 +15,113 @@
              @endforeach
             </ul>
         @endif  
-        <div class="mb-3 row">
-            <label for="letter_type_id" class="col-sm-2 col-form-label">Nomor Surat:</label>
-            <div class="col-sm-10">
-                <input type="number" class="form-control" id="letter_type_id" name="letter_type_id" value="{{ old ('letter_type_id')}}">
-            </div>
+        <div class="mb-3">
+            <label for="letter_perihal" class="form-label">Perihal</label>
+            <input type="text" class="form-control @error('letter_perihal') is-invalid @enderror" id="letter_perihal"
+                name="letter_perihal" required autofocus value="{{ old('letter_perihal') }}">
         </div>
 
 
-        <div class="mb-3 row">
-            <label for="letter_perihal" class="col-sm-2 col-form-label">Perihal:</label>
-            <div class="col-sm-10">
-                <input type="text" class="form-control" id="letter_perihal" name="letter_perihal" value="{{ old ('letter_perihal')}}">
-            </div>
+        <div class="mb-3">
+            <label for="slug" class="form-label">Klasifikasi Surat :</label>
+            <select class="form-select" aria-label="Default select example" name="letter_type_id">
+                <option selected>Pilih</option>
+                @foreach($letters as $lt)
+                <option value="{{ $lt->id }}">{{ $lt->name_type }}</option>
+                @endforeach
+            </select>
         </div>
 
-        <div class="mb-3 row">
-            <label for="recepients" class="col-sm-2 col-form-label">Penerima surat:</label>
-            <div class="col-sm-10">
-                <input type="text" class="form-control" id="recepients" name="recepients" value="{{ old ('recepients')}}">
-            </div>
+        <div class="mb-3">
+                <label for="content" class="form-label">Isi Surat</label>
+                
+                <input id="content" type="text" name="content" value="{{ old('content') }}">
+                <trix-editor input="content"></trix-editor>
+
+                @section('scripts')
+                    <script>
+                        document.addEventListener('trix-change', function (e) {
+                            var contentValue = e.target.editor.value;
+                            document.getElementById('content').value = contentValue;
+                        });
+                    </script>
+                @endsection
+
         </div>
 
-        <div class="mb-3 row">
-            <label for="content" class="col-sm-2 col-form-label">Content:</label>
-            <div class="col-sm-10">
-                <input type="text" class="form-control" id="content" name="content" value="{{ old ('content')}}">
+        {{-- <div class="mb-3">
+            <label for="image" class="form-label">Lampiran</label>
+            <img src="" class="img-preview img-fluid mb-3" id="frame" style="max-height: 500px; overflow:hidden">
+            <input class="form-control " type="file" id="attachment" name="attachment" onchange="preview()">
+        </div> --}}
+
+        <div class="mb-3">
+            <label for="recipients" class="form-label">Peserta Rapat</label><br>
+            
+            <!-- <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="Dinda" id="recipients"
+                    name="recipients[]"> 
+                <label class="form-check-label" for="recipients">
+                    
+                </label>
+            </div> -->
+
+            <!-- <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="Rafly" id="recipients_rafly"
+                    name="recipients[]">
+                <label class="form-check-label" for="recipients_rafly">Rafly</label>
             </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="Julian" id="recipients_julian"
+                    name="recipients[]">
+                <label class="form-check-label" for="recipients_julian">Julian</label>
+            </div> -->
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nama</th>
+                            <th>Peserta</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Rafly</td>
+                            <td>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="8" id="recipients_rafly"
+                                        name="recipients[]">
+                                    <label class="form-check-label" for="recipients_rafly"></label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Julian</td>
+                            <td>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="1" id="recipients_julian"
+                                        name="recipients[]">
+                                    <label class="form-check-label" for="recipients_julian"></label>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            
         </div>
 
-        <div class="mb-3 row">
-            <label for="attachment" class="col-sm-2 col-form-label">Lampiran    :</label>
-            <div class="col-sm-10">
-                <input type="text" class="form-control" id="attachment" name="attachment" value="{{ old ('attachment')}}">
-            </div>
-        </div>
-
-        <div class="mb-3 row">
-            <label for="notulis" class="col-sm-2 col-form-label">notulis:</label>
-            <div class="col-sm-10">
-                <input type="text" class="form-control" id="notulis" name="notulis" value="{{ old ('notulis')}}">
-            </div>
+        <div class="mb-3">
+            <label for="notulis" class="form-label">Notulis</label>
+            <select class="form-select" id="notulis" name="notulis" required>
+                <option selected>Pilih</option>
+                @foreach($users as $user)
+                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                @endforeach
+            </select>
         </div>
 
         <button type="submit" class="btn btn-primary mt-3">Tambah Data</button>

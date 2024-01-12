@@ -25,7 +25,7 @@
                     </a>
                     <ul class="dropdown-menu">
                       <li><a class="dropdown-item" href="{{ route('letter_type.home') }}">Data Klasifikasi Surat</a></li>
-                      <li><a class="dropdown-item" href="#">data surat</a></li>
+                      <li><a class="dropdown-item" href="{{ route('letter.home') }}">data surat</a></li>
                     </ul>
                   </li>
                   <li class="nav-item dropdown">

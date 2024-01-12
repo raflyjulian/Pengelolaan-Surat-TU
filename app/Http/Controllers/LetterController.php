@@ -2,17 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\letter;
 use Illuminate\Http\Request;
+use App\Models\letter_type;
 
 class LetterController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $letter = letter::orderBy('letter_perihal', 'ASC')->simplePaginate(5);
+        $query = letter::with('letterType');
+
+        $letters = $query->paginate(2);
         return view('letter.index',  compact('letters'));
     }
 
@@ -21,7 +25,9 @@ class LetterController extends Controller
      */
     public function create()
     {
-        return view('letter.create');
+        $letters = letter_type::all();
+        $users = User::all();
+        return view('letter.create',compact('letters','users'));
     }
 
     /**
@@ -30,25 +36,19 @@ class LetterController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+           
             'letter_perihal' => 'required',
-            'recipients' => 'required',
+            'letter_type_id' => 'required',
             'content' => 'required',
-            'attachment' => 'required',
+            'recipients' => 'required|array',
             'notulis' => 'required',
-        ],[
-            'letter_perihal.required' => 'Perihal Surat wajib di isi',
-            'recepients' => 'penerima wajib di pilih',
-            'content' => 'isi surat wajib di isi',
-            'attachment' => 'lampiran wajib di isi',
-            'notulis' => 'notulis wajib di isi'
-        ]
-    );
+        ]);
     
-        Letter::create([
+        $letter = Letter::create([
             'letter_perihal' => $request->letter_perihal,
-            'recepients' => $request->recepients,
+            'letter_type_id' => $request->letter_type_id,
             'content' => $request->content,
-            'attachment' => $request->attachment,
+            'recipients' => json_encode($request->recipients),
             'notulis' => $request->notulis,
         ]);
     
@@ -61,7 +61,11 @@ class LetterController extends Controller
      */
     public function show(letter $letter)
     {
-        //
+        $letters = Letter::findOrFail($id);
+        $users = User::all();
+        $letter_type = $letters->letter_type;
+
+        return view('letter.index', compact('letters','users', 'letter_type'));
     }
 
     /**
@@ -69,9 +73,11 @@ class LetterController extends Controller
      */
     public function edit(letter $letter)
     {
-        $letter = letter::find($id);
+        $letter = Letter::findOrFail($id);
+        $letters = letter_type::all();
+        $users = User::all();
 
-        return view('letter.edit', compact('letter'));
+        return view('letter.edit', compact('letter', 'letters','users'));
     }
 
     /**
@@ -79,7 +85,27 @@ class LetterController extends Controller
      */
     public function update(Request $request, letter $letter)
     {
-        //
+        $request->validate([
+            // ... validasi lainnya ...
+            'letter_perihal' => 'required',
+            'letter_type_id' => 'required',
+            'content' => 'required',
+            'recipients' => 'required|array',
+            'notulis' => 'required',
+        ]);
+
+        $letter = Letter::findOrFail($id);
+
+        // Update data surat dengan informasi yang baru
+        $letter->update([
+            'letter_perihal' => $request->letter_perihal,
+            'letter_type_id' => $request->letter_type_id,
+            'content' => $request->content,
+            'recipients' => json_encode($request->recipients),
+            'notulis' => $request->notulis,
+        ]);
+
+        return redirect()->route('letter.home')->with('success','Berhasil memperbarui data');
     }
 
     /**
@@ -87,6 +113,8 @@ class LetterController extends Controller
      */
     public function destroy(letter $letter)
     {
-        //
+        Letter::where('id', $id)->delete();
+
+        return redirect()->back()->with('deleted', 'Berhasil menghapus data!');
     }
 }
